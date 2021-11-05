@@ -14,7 +14,7 @@ defmodule Blackjack.DeckTest do
     end)
   end
 
-  test "it deals the first card from the deck" do
-    assert Deck.deal_card(["A", "2"]) == "A"
+  test "it deals the first card from the deck and returns the rest" do
+    assert Deck.deal_card(["A", "2"]) == {"A", ["2"]}
   end
 end

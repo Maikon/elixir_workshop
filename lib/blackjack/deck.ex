@@ -12,5 +12,6 @@ defmodule Blackjack.Deck do
 
   def shuffle(deck), do: Enum.shuffle(deck)
 
-  def deal_card([first | _rest]), do: first
+  def deal_card([card | rest]), do: {card, rest}
+  def deal_card({_first, rest}), do: deal_card(rest)
 end
