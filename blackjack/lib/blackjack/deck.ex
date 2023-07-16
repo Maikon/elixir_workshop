@@ -1,11 +1,15 @@
 defmodule Blackjack.Deck do
+  @card_suites ["D", "H", "C", "S"]
   @face_cards ["A", "K", "Q", "J"]
   @numeral_cards Enum.map(2..10, &to_string/1)
 
   def generate do
-    1..4
-    |> Enum.reduce([], fn _, cards ->
-      cards ++ @face_cards ++ @numeral_cards
+    @card_suites
+    |> Enum.reduce([], fn suite, cards ->
+      face_cards = Enum.map(@face_cards, &(&1 <> suite))
+      numeral_cards = Enum.map(@numeral_cards, &(&1 <> suite))
+
+      cards ++ face_cards ++ numeral_cards
     end)
     |> shuffle()
   end

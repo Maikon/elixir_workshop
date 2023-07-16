@@ -5,7 +5,7 @@ defmodule Blackjack.MixProject do
     [
       app: :blackjack,
       version: "0.1.0",
-      elixir: "~> 1.12",
+      elixir: "~> 1.15",
       start_permanent: Mix.env() == :prod,
       deps: deps()
     ]
@@ -14,8 +14,8 @@ defmodule Blackjack.MixProject do
   # Run "mix help compile.app" to learn about applications.
   def application do
     [
-      extra_applications: [:logger],
-      mod: {Blackjack.Application, []}
+      extra_applications: [:logger]
+      # mod: {Blackjack.Application, []}
     ]
   end
 
