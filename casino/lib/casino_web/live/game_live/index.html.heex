@@ -1,12 +1,14 @@
 <.button phx-click="deal_cards">Deal cards</.button>
 
 <.header>
+  <p>Score: <%= @dealer_score %></p>
   Dealer Hand
   <span><%= convert_hand(assigns, @game.dealer, :dealer) %></span>
   <.button phx-click="deal_dealer">Deal dealer</.button>
 </.header>
 
 <.header>
+  <p>Score: <%= @player_score %></p>
   Player Hand
   <span><%= convert_hand(assigns, @game.player, :player) %></span>
     <.button phx-click="deal_player">Deal player</.button>

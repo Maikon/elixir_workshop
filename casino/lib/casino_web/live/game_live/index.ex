@@ -10,49 +10,61 @@ defmodule CasinoWeb.GameLive.Index do
     {:ok,
      socket
      |> assign(:game_pid, game_pid)
+     |> assign(:dealer_score, 0)
+     |> assign(:player_score, 0)
      |> assign(:game, Blackjack.Game.state(game_pid))}
   end
 
   @impl true
   def handle_event("deal_cards", _url, socket) do
     game_pid = socket.assigns.game_pid
+    updated_game = Blackjack.Game.deal_cards(game_pid)
+
+    socket = socket
+    |> update(:game, fn _game -> updated_game end)
+    |> update(:dealer_score, fn _score -> dealer_score(updated_game.dealer) end)
+    |> update(:player_score, fn _dealer -> score(updated_game.player) end)
 
     {
       :noreply,
-      update(
-        socket,
-        :game,
-        fn _game -> Blackjack.Game.deal_cards(game_pid) end
-      )
+      socket
     }
   end
 
   @impl true
   def handle_event("deal_dealer", _url, socket) do
     game_pid = socket.assigns.game_pid
+    updated_game = Game.deal_player(:dealer, game_pid)
 
-    {
-      :noreply,
-      update(
-        socket,
-        :game,
-        fn _game -> Game.deal_player(:dealer, game_pid) end
-      )
-    }
+    socket = socket
+    |> update(:game, fn _game -> updated_game end)
+    |> update(:dealer_score, fn _score -> dealer_score(updated_game.dealer) end)
+    |> update(:player_score, fn _dealer -> score(updated_game.player) end)
+
+    {:noreply, socket}
   end
 
   @impl true
   def handle_event("deal_player", _url, socket) do
     game_pid = socket.assigns.game_pid
+    updated_game = Game.deal_player(:player, game_pid)
 
-    {
-      :noreply,
-      update(
-        socket,
-        :game,
-        fn _game -> Game.deal_player(:player, game_pid) end
-      )
-    }
+    socket = socket
+    |> update(:game, fn _game -> updated_game end)
+    |> update(:dealer_score, fn _score -> dealer_score(updated_game.dealer) end)
+    |> update(:player_score, fn _dealer -> score(updated_game.player) end)
+
+    {:noreply, socket}
+  end
+
+  def dealer_score(dealer_hand) do
+    case length(dealer_hand) > 2 do
+      true ->
+        score(dealer_hand)
+      _ ->
+        [card1, _card2] = dealer_hand
+        score([card1])
+    end
   end
 
   def convert_hand(_assigns, [], _player), do: ""
@@ -62,7 +74,10 @@ defmodule CasinoWeb.GameLive.Index do
       hand = cards
       |> Enum.map(fn hand -> hand_to_card(hand) end)
 
-      assigns = assign(assigns, :hand, hand)
+      score = score(cards)
+      assigns = assigns
+      |> assign(:hand, hand)
+
       ~H"""
       <%= for card <- @hand do %>
       <span><img src={~p"/images/cards/#{card}"} style="display: inline;" width="120" /></span>
@@ -73,8 +88,10 @@ defmodule CasinoWeb.GameLive.Index do
       |> Enum.map(fn hand -> hand_to_card(hand) end)
 
       hand = [card1, "astronaut.svg"]
+      score = score([List.first(cards)])
 
-      assigns = assign(assigns, :hand, hand)
+      assigns = assigns
+      |> assign(:hand, hand)
 
       ~H"""
       <%= for card <- @hand do %>
@@ -96,6 +113,8 @@ defmodule CasinoWeb.GameLive.Index do
     <% end %>
     """
   end
+
+  def score(cards), do: cards |> Blackjack.HandScorer.score()
 
   def hand_to_card(hand) do
     suites = %{
