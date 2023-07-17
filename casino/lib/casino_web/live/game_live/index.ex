@@ -16,6 +16,18 @@ defmodule CasinoWeb.GameLive.Index do
   end
 
   @impl true
+  def handle_event("new_game", _url, socket) do
+    {:ok, game_pid} = Blackjack.Game.start_link()
+
+    {:noreply,
+     socket
+     |> assign(:game_pid, game_pid)
+     |> assign(:dealer_score, 0)
+     |> assign(:player_score, 0)
+     |> assign(:game, Blackjack.Game.state(game_pid))}
+  end
+
+  @impl true
   def handle_event("deal_cards", _url, socket) do
     game_pid = socket.assigns.game_pid
     updated_game = Blackjack.Game.deal_cards(game_pid)
