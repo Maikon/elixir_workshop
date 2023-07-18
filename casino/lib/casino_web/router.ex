@@ -19,12 +19,7 @@ defmodule CasinoWeb.Router do
 
     get "/", PageController, :home
 
-    live "/games", GameLive.Index, :index
-    live "/games/new", GameLive.Index, :new
-    live "/games/deal", GameLive.Index, :deal
-    # live "/games/:id/edit", GameLive.Index, :edit
-
-    # live "/games/:id", GameLive.Show, :show
+    live "/game", GameLive.Index, :index
   end
 
   # Other scopes may use custom stacks.

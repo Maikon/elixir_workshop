@@ -2,24 +2,12 @@ defmodule Blackjack.HandScorer do
   alias Blackjack.Deck
 
   @valid_cards Deck.generate()
-  @aces ["AS", "AC", "AH", "AD"]
-  @face_cards [
-    "KS",
-    "KC",
-    "KH",
-    "KD",
-    "QS",
-    "QC",
-    "QH",
-    "QD",
-    "JS",
-    "JC",
-    "JH",
-    "JD",
-  ]
+  @aces Deck.aces(@valid_cards)
+  @face_cards Deck.face_cards(@valid_cards)
 
   def score(hand) do
-    Enum.reduce(hand, 0, fn card, total ->
+    hand
+    |> Enum.reduce(0, fn card, total ->
       total + get_numerical_value(card)
     end)
     |> evaluate_aces(hand)
@@ -29,8 +17,7 @@ defmodule Blackjack.HandScorer do
   defp get_numerical_value(card) when card in @aces, do: 11
   defp get_numerical_value(card) when card in @face_cards, do: 10
   defp get_numerical_value(card) do
-    [value, _suite] = card
-    |> String.split(~r{S|C|D|H}, include_captures: true, trim: true)
+    [value, _suite] = Deck.separate_value_and_suite(card)
 
     String.to_integer(value)
   end
@@ -40,7 +27,7 @@ defmodule Blackjack.HandScorer do
       aces =
         hand
         |> Enum.filter(fn card -> card in @aces end)
-      |> Enum.count()
+        |> Enum.count()
 
       total_score - aces * 10
     else

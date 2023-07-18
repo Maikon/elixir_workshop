@@ -2,6 +2,7 @@ defmodule CasinoWeb.GameLive.Index do
   use CasinoWeb, :live_view
 
   alias Blackjack.Game
+  alias Blackjack.Deck
 
   @impl true
   def mount(_params, _session, socket) do
@@ -121,25 +122,12 @@ defmodule CasinoWeb.GameLive.Index do
   defp score(cards), do: cards |> Blackjack.HandScorer.score()
 
   defp hand_to_card(hand) do
-    suites = %{
-      "S" => "spades",
-      "C" => "clubs",
-      "D" => "diamonds",
-      "H" => "hearts",
-    }
-    [card, suite] = hand
-    |> String.split(~r{S|C|D|H}, include_captures: true, trim: true)
+    [card, suit] = Deck.separate_value_and_suite(hand)
 
     if card in ["A", "K", "Q", "J"] do
-      face_cards = %{
-      "A" => "ace",
-      "K" => "king",
-      "Q" => "queen",
-      "J" => "jack",
-    }
-      "#{Map.get(suites, suite)}_#{Map.get(face_cards, card)}.svg"
+      "#{Deck.suit_extended_name(suit)}_#{Deck.face_card_extended_name(card)}.svg"
     else
-      "#{Map.get(suites, suite)}_#{card}.svg"
+      "#{Deck.suit_extended_name(suit)}_#{card}.svg"
     end
   end
 end
