@@ -39,8 +39,8 @@ defmodule Blackjack.HandScorer do
     if total_score > 21 do
       aces =
         hand
-        |> Enum.filter(fn card -> card == "A" end)
-        |> Enum.count()
+        |> Enum.filter(fn card -> card in @aces end)
+      |> Enum.count()
 
       total_score - aces * 10
     else
