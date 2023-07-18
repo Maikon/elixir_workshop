@@ -7,13 +7,12 @@
   <span>
     <%= convert_hand(assigns, @game.dealer, :dealer, @show_dealer) %>
   </span>
-  <.button phx-click="deal_dealer" class="bg-blue-800">Deal dealer</.button>
-  <.button phx-click="show_dealer" class="bg-red-800">Show dealer</.button>
+  <.button phx-click="deal_dealer" class="bg-blue-700">Deal dealer</.button>
+  <.button phx-click="show_dealer" class="bg-red-700">Show dealer</.button>
 </.header>
 
 <.header>
   <p>Score: <%= @player_score %></p>
-  Player Hand
-  <span><%= convert_hand(assigns, @game.player, :player, @show_dealer) %></span>
-    <.button phx-click="deal_player" class="bg-green-800">Deal player</.button>
+  Player Hand <span><%= convert_hand(assigns, @game.player, :player, @show_dealer) %></span>
+  <.button phx-click="deal_player" class="bg-green-700">Deal player</.button>
 </.header>

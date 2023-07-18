@@ -19,10 +19,13 @@ defmodule CasinoWeb.GameLive.Index do
     game_pid = socket.assigns.game_pid
     updated_game = Blackjack.Game.deal_cards(game_pid)
 
-    socket = socket
-    |> update(:game, fn _game -> updated_game end)
-    |> update(:dealer_score, fn _score -> dealer_score(updated_game.dealer, socket.assigns.show_dealer) end)
-    |> update(:player_score, fn _dealer -> score(updated_game.player) end)
+    socket =
+      socket
+      |> update(:game, fn _game -> updated_game end)
+      |> update(:dealer_score, fn _score ->
+        dealer_score(updated_game.dealer, socket.assigns.show_dealer)
+      end)
+      |> update(:player_score, fn _dealer -> score(updated_game.player) end)
 
     {
       :noreply,
@@ -35,9 +38,12 @@ defmodule CasinoWeb.GameLive.Index do
     game_pid = socket.assigns.game_pid
     updated_game = Game.deal_player(:dealer, game_pid)
 
-    socket = socket
-    |> update(:game, fn _game -> updated_game end)
-    |> update(:dealer_score, fn _score -> dealer_score(updated_game.dealer, socket.assigns.show_dealer) end)
+    socket =
+      socket
+      |> update(:game, fn _game -> updated_game end)
+      |> update(:dealer_score, fn _score ->
+        dealer_score(updated_game.dealer, socket.assigns.show_dealer)
+      end)
 
     {:noreply, socket}
   end
@@ -47,9 +53,10 @@ defmodule CasinoWeb.GameLive.Index do
     game_pid = socket.assigns.game_pid
     updated_game = Game.deal_player(:player, game_pid)
 
-    socket = socket
-    |> update(:game, fn _game -> updated_game end)
-    |> update(:player_score, fn _dealer -> score(updated_game.player) end)
+    socket =
+      socket
+      |> update(:game, fn _game -> updated_game end)
+      |> update(:player_score, fn _dealer -> score(updated_game.player) end)
 
     {:noreply, socket}
   end
@@ -63,36 +70,40 @@ defmodule CasinoWeb.GameLive.Index do
       socket
       |> update(:show_dealer, fn _state -> true end)
 
-    {:noreply, update(
-      updated_socket,
-      :dealer_score, fn _score -> dealer_score(game.dealer, updated_socket.assigns.show_dealer) end
-      )
-    }
+    {:noreply,
+     update(
+       updated_socket,
+       :dealer_score,
+       fn _score -> dealer_score(game.dealer, updated_socket.assigns.show_dealer) end
+     )}
   end
 
   def convert_hand(_assigns, [], _player, _show_dealer), do: ""
+
   def convert_hand(assigns, cards, player, show_dealer) do
     if !show_dealer && player == :dealer do
-      [card1, _card2] = cards
-      |> Enum.map(fn hand -> hand_to_card(hand) end)
+      [card1, _card2] =
+        cards
+        |> Enum.map(fn hand -> hand_to_card(hand) end)
 
       hand = [card1, "astronaut.svg"]
       assigns = assign(assigns, :hand, hand)
 
       ~H"""
       <%= for card <- @hand do %>
-      <span><img src={~p"/images/cards/#{card}"} style="display: inline;" width="120" /></span>
+        <span><img src={~p"/images/cards/#{card}"} style="display: inline;" width="120" /></span>
       <% end %>
       """
     else
-      hand = cards
-      |> Enum.map(fn hand -> hand_to_card(hand) end)
+      hand =
+        cards
+        |> Enum.map(fn hand -> hand_to_card(hand) end)
 
       assigns = assign(assigns, :hand, hand)
 
       ~H"""
       <%= for card <- @hand do %>
-      <span><img src={~p"/images/cards/#{card}"} style="display: inline;" width="120" /></span>
+        <span><img src={~p"/images/cards/#{card}"} style="display: inline;" width="120" /></span>
       <% end %>
       """
     end
@@ -113,6 +124,7 @@ defmodule CasinoWeb.GameLive.Index do
     case show_dealer do
       true ->
         score(dealer_hand)
+
       _ ->
         [card1, _card2] = dealer_hand
         score([card1])
